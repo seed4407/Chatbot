@@ -2,7 +2,7 @@ services:
   demo_01_service_01:
     build: .
     ports:
-      - "5000:80"
+      - "5001:80"
     volumes:
       - .:/code
     links:
@@ -19,6 +19,6 @@ volumes:
 
 networks:
   default:
-    name: demo_01
+    name: Chatbot
     external: true
 

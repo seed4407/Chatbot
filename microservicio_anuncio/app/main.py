@@ -21,22 +21,20 @@ def comunicacion_publicidad(background_tasks, interval):
     contador_anuncios = 0
     while True:
         try:
-            response = requests.get('http://172.18.0.5:80/')
+            response = requests.get('http://localhost:5000/estado')
             response.raise_for_status()  # Verificar el código de estado HTTP
             # Procesar la respuesta exitosa
-            data = response.json()
-
-        except requests.exceptions.RequestException:
-            raise HTTPException(status_code=503, detail="No se pudo conectar a servidor")
         
         except requests.exceptions.HTTPError:
             raise HTTPException(status_code=404, detail="No se encontro recurso")
 
         except requests.exceptions.Timeout:
             raise HTTPException(status_code=504, detail="Tiempo limite para respuesta alcanzado")
-
-        estado = data[0]["estado"]
-        if(estado == "conectado"):
+        
+        except requests.exceptions.RequestException:
+            raise HTTPException(status_code=503, detail="No se pudo conectar a servidor")
+        
+        if(response == "Conectado"):
             anuncios_para_enviar = mongodb_client.service_01.anuncios.find_one({ "id": { "$gte": str(contador_anuncios) } })
             if(anuncios_para_enviar == None):
                 contador_anuncios = 0

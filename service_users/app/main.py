@@ -49,7 +49,7 @@ class UserUpdate(BaseModel):
     email: Optional[str]  # = Field(default=None, examples=["juan@gmail.com"])
     admin: Optional[bool]  # = Field(default=None, examples=["True"])
     phone_number: Optional[int]  # = Field(default=None, examples=["123456789"])
-    ad: Optional[str]
+    ad: Optional[str] = Field(default="Desconectado", examples=["Desconectado"])
 
     class Config:
         arbitrary_types_allowed = True
@@ -61,7 +61,7 @@ class UserUpdate(BaseModel):
                 "email": "email@email.com",
                 "admin": True,
                 "phone_number": 1234567890,
-                "ad": "Compra Coca-Cola",
+                "ad": "Conectado",
             }
         }
 
@@ -71,6 +71,22 @@ logging.basicConfig(
 )
 
 emit_events = Emit()
+
+@app.get(
+    "/estado",
+    tags=["User"],
+    response_model=str,
+    summary="Get estado",
+    response_description="String indicando si hay usuario conectado",
+    status_code=status.HTTP_200_OK,
+)
+def get_estado():
+    logging.info("Getting all Users...")
+    dato = mongodb_client.service_users.users.find_one({"id": "Conectado"})
+    if(dato == None):
+        raise HTTPException(status_code=404, detail="No se encontro anuncio")
+    else:
+        return "Conectado"
 
 
 @app.get(
