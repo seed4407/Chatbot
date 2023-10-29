@@ -1,0 +1,23 @@
+services:
+  tarea_u4_service_users:
+    build: .
+    ports:
+      - "5000:80"
+    volumes:
+      - .:/code
+    links:
+      - tarea_u4_service_users_mongodb
+  tarea_u4_service_users_mongodb:
+    image: mongo:5.0
+    volumes:
+      - tarea_u4_service_users_mongodb_container:/data/db
+    logging:
+      driver: none
+
+volumes:
+  tarea_u4_service_users_mongodb_container:
+
+networks:
+  default:
+    name: microsvcs
+    external: true

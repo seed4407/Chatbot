@@ -1,0 +1,12 @@
+services:
+  tarea_u4_api_gateway:
+    build: .
+    ports:
+      - "5001:80"
+    volumes:
+      - .:/code
+
+networks:
+  default:
+    name: microsvcs
+    external: true

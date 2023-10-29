@@ -1,0 +1,24 @@
+version: '3.9'
+
+services:
+  middleware:
+    container_name: middleware
+    build: .
+    ports:
+      - "5000:80"
+    volumes:
+      - .:/code
+  
+  receiver:
+    build: .
+    command: python3 events/events.py
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports:
+        - 5672:5672
+        - 15672:15672
+
+networks:
+  default:
+    name: middleware
