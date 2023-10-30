@@ -82,9 +82,9 @@ emit_events = Emit()
 )
 def get_estado():
     logging.info("Getting all Users...")
-    dato = mongodb_client.service_users.users.find_one({"id": "Conectado"})
+    dato = mongodb_client.service_users.users.find_one({"ad": "Conectado"})
     if(dato == None):
-        raise HTTPException(status_code=404, detail="No se encontro anuncio")
+        raise HTTPException(status_code=404, detail="No se encontro usuario conectado")
     else:
         return "Conectado"
 

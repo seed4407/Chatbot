@@ -21,7 +21,7 @@ def comunicacion_publicidad(background_tasks, interval):
     contador_anuncios = 0
     while True:
         try:
-            response = requests.get('http://localhost:5000/estado')
+            response = requests.get('http://tarea_u4_service_users/estado')
             response.raise_for_status()  # Verificar el código de estado HTTP
             # Procesar la respuesta exitosa
         
@@ -34,23 +34,25 @@ def comunicacion_publicidad(background_tasks, interval):
         except requests.exceptions.RequestException:
             raise HTTPException(status_code=503, detail="No se pudo conectar a servidor")
         
-        if(response == "Conectado"):
-            anuncios_para_enviar = mongodb_client.service_01.anuncios.find_one({ "id": { "$gte": str(contador_anuncios) } })
-            if(anuncios_para_enviar == None):
-                contador_anuncios = 0
-                anuncios_para_enviar = mongodb_client.service_01.anuncios.find_one({ "id": { "$gte": str(contador_anuncios) } })
-                contador_anuncios = int(anuncios_para_enviar["id"]) + 1
-            else:
-                contador_anuncios = int(anuncios_para_enviar["id"]) + 1
-            try: 
-                connection = pika.BlockingConnection(pika.ConnectionParameters(host='172.18.0.6'))
-            except pika.exceptions.AMQPConnectionError:
-                raise HTTPException(status_code=503, detail="No se pudo conectar a la cola rabbitMQ")
+        logging.info(response.text)
+        if(str(response.text) == "Conectado"):
+            logging.info("Conectado")
+            # anuncios_para_enviar = mongodb_client.service_01.anuncios.find_one({ "id": { "$gte": str(contador_anuncios) } })
+            # if(anuncios_para_enviar == None):
+            #     contador_anuncios = 0
+            #     anuncios_para_enviar = mongodb_client.service_01.anuncios.find_one({ "id": { "$gte": str(contador_anuncios) } })
+            #     contador_anuncios = int(anuncios_para_enviar["id"]) + 1
+            # else:
+            #     contador_anuncios = int(anuncios_para_enviar["id"]) + 1
+            # try: 
+            #     connection = pika.BlockingConnection(pika.ConnectionParameters(host='172.18.0.6'))
+            # except pika.exceptions.AMQPConnectionError:
+            #     raise HTTPException(status_code=503, detail="No se pudo conectar a la cola rabbitMQ")
 
-            channel = connection.channel()
-            # channel.queue_declare(queue='hello')
-            channel.basic_publish(exchange='', routing_key='publicidad', body=anuncios_para_enviar["description"])
-            connection.close()
+            # channel = connection.channel()
+            # # channel.queue_declare(queue='hello')
+            # channel.basic_publish(exchange='', routing_key='publicidad', body=anuncios_para_enviar["description"])
+            # connection.close()
         time.sleep(interval)
 
 class publicidad(BaseModel):

@@ -19,6 +19,6 @@ volumes:
 
 networks:
   default:
-    name: Chatbot
+    name: microsvcs
     external: true
 
