@@ -5,7 +5,7 @@ services:
     container_name: middleware
     build: .
     ports:
-      - "5000:80"
+      - "5002:80"
     volumes:
       - .:/code
   
@@ -21,4 +21,4 @@ services:
 
 networks:
   default:
-    name: middleware
+    name: microsvcs

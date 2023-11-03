@@ -2,8 +2,8 @@ services:
   message_broker:
     image: rabbitmq:3-management-alpine
     ports:
-        - 5672:5672
-        - 15672:15672
+        - 5005:5672
+        - 5006:15672
 
 networks:
   default:

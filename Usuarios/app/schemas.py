@@ -7,7 +7,7 @@ def userEntity(User) -> dict:
         "email": User["email"],
         "admin": User["admin"],
         "phone_number": User["phone_number"],
-        "ad": User["ad"],
+        "token": User["token"],
     }
 
 

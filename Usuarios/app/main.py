@@ -25,7 +25,7 @@ class User(BaseModel):
     email: Optional[str]  # = Field(default=None, examples=["juan@gmail.com"])
     admin: Optional[bool]  # = Field(default=None, examples=["True"])
     phone_number: Optional[int]  # = Field(default=None, examples=["123456789"])
-    ad: Optional[str]
+    token: Optional[str] = Field(default="", examples=[""])
 
     class Config:
         arbitrary_types_allowed = True
@@ -37,7 +37,7 @@ class User(BaseModel):
                 "email": "email@email.com",
                 "admin": True,
                 "phone_number": 1234567890,
-                "ad": "Compra Coca-Cola",
+                "token": "1234567890abcdef"
             }
         }
 
@@ -49,7 +49,7 @@ class UserUpdate(BaseModel):
     email: Optional[str]  # = Field(default=None, examples=["juan@gmail.com"])
     admin: Optional[bool]  # = Field(default=None, examples=["True"])
     phone_number: Optional[int]  # = Field(default=None, examples=["123456789"])
-    ad: Optional[str] = Field(default="Desconectado", examples=["Desconectado"])
+    token: Optional[str] = Field(default="", examples=[""])
 
     class Config:
         arbitrary_types_allowed = True
@@ -61,7 +61,7 @@ class UserUpdate(BaseModel):
                 "email": "email@email.com",
                 "admin": True,
                 "phone_number": 1234567890,
-                "ad": "Conectado",
+                "token": "1234567890abcdef"
             }
         }
 
@@ -73,16 +73,17 @@ logging.basicConfig(
 emit_events = Emit()
 
 @app.get(
-    "/estado",
+    "/token",
     tags=["User"],
     response_model=str,
-    summary="Get estado",
+    summary="Get token valido",
     response_description="String indicando si hay usuario conectado",
     status_code=status.HTTP_200_OK,
 )
-def get_estado():
-    logging.info("Getting all Users...")
-    dato = mongodb_client.service_users.users.find_one({"ad": "Conectado"})
+def get_token():
+    logging.info("Getting token valido")
+    dato = mongodb_client.service_users.users.find({"token": {"$ne": ""}})
+    #validar token para ver si hay usuario conectado valido
     if(dato == None):
         raise HTTPException(status_code=404, detail="No se encontro usuario conectado")
     else:
@@ -135,7 +136,6 @@ def create_user(user: User):
     - **email**: optional parameter
     - **admin**: optional parameter, doesn't have an use for now
     - **phone_number**: optional parameter, the User's phone number
-    - **ad**: optional parameter
     """
     try:
         new_user = dict(user)
@@ -153,19 +153,19 @@ def create_user(user: User):
         raise HTTPException(status_code=404, detail="Something went wrong")
 
 
-@app.put("/users/{id}/{ad}",
+@app.put("/users/{id}/{token}",
     tags=["User"],
     response_model=User,
-    summary="Set ad to user",
+    summary="Actualizar token",
     response_description="The ad received",
 )
-def update_user_ad(id: str, ad: str):
+def update_user_token(id: str, token: str):
     user = mongodb_client.service_users.users.find_one({"_id": id})
     try:
         mongodb_client.service_users.users.find_one_and_update(
-            {"_id": ObjectId(id)}, {"$set": {"ad": str(ad)}}
+            {"_id": ObjectId(id)}, {"$set": {"token": str(token)}}
         )
-        logging.info("User has new ad: %s" % ad)
+        logging.info("User has new token: %s" % token)
         emit_events.send(id, "updatead", user)
         return userEntity(
             mongodb_client.service_users.users.find_one({"_id": ObjectId(id)})
@@ -245,24 +245,24 @@ def delete_user(id: str):
         raise HTTPException(status_code=404, detail="User not found")
 
 
-@app.delete(
-    "/users/{id}/ad",
-    tags=["User"],
-    response_model=User,
-    summary="Delete the ad from the user",
-    response_description="The Deleted ad",
-)
-def delete_user_ad(id: str):
-    try:
-        user = mongodb_client.service_users.users.find_one({"_id": ObjectId(id)})
-        user["ad"] = ""
-        mongodb_client.service_users.users.find_one_and_update(
-            {"_id": ObjectId(id)}, {"$set": dict(user)}
-        )
-        logging.info("User ad deleted: %s" % id)
-        emit_events.send(id, "deletead", user)
-        return userEntity(
-            mongodb_client.service_users.users.find_one({"_id": ObjectId(id)})
-        )
-    except (InvalidId, TypeError):
-        raise HTTPException(status_code=404, detail="User not found")
+# @app.delete(
+#     "/users/{id}/ad",
+#     tags=["User"],
+#     response_model=User,
+#     summary="Delete the ad from the user",
+#     response_description="The Deleted ad",
+# )
+# def delete_user_ad(id: str):
+#     try:
+#         user = mongodb_client.service_users.users.find_one({"_id": ObjectId(id)})
+#         user["ad"] = ""
+#         mongodb_client.service_users.users.find_one_and_update(
+#             {"_id": ObjectId(id)}, {"$set": dict(user)}
+#         )
+#         logging.info("User ad deleted: %s" % id)
+#         emit_events.send(id, "deletead", user)
+#         return userEntity(
+#             mongodb_client.service_users.users.find_one({"_id": ObjectId(id)})
+#         )
+#     except (InvalidId, TypeError):
+#         raise HTTPException(status_code=404, detail="User not found")
