@@ -1,0 +1,16 @@
+version: '3.0'
+
+services:
+  demo_05_interface:
+    stdin_open: true
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./app:/code
+    networks:
+      - microsvcs
+
+networks:
+  microsvcs:
+    external: true
