@@ -70,6 +70,12 @@ logging.basicConfig(
     level=logging.INFO, format="%(asctime)s:%(levelname)s:%(name)s:%(message)s"
 )
 
+# logging.basicConfig(level = logging.DEBUG,
+#                     format = '%(asctime)s:%(levelname)s:%(name)s:%(message)s',
+#                     encoding='utf-8')
+
+# logging.basicConfig(filename='app.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+
 emit_events = Emit()
 
 @app.get(
@@ -89,6 +95,19 @@ def get_token():
     else:
         return "Conectado"
 
+@app.get(
+    "/users/{name}/{password}",
+    tags=["User"],
+    response_model=str,
+    summary="Logging",
+    response_description="Token de usuario",
+)
+def logging(name: str, password: str):
+    try:
+        user = mongodb_client.service_users.users.find_one({"name": name,"password": password})
+        return "Token"
+    except (InvalidId, TypeError):
+        return "No se encontro usuario"
 
 @app.get(
     "/users",
@@ -99,7 +118,7 @@ def get_token():
     status_code=status.HTTP_200_OK,
 )
 def get_all_users():
-    logging.info("Getting all Users...")
+    # logging.info("Getting all Users...")
     return usersEntity(mongodb_client.service_users.users.find({}))
 
 
@@ -113,7 +132,7 @@ def get_all_users():
 def get_user(id: str):
     try:
         user = mongodb_client.service_users.users.find_one({"_id": ObjectId(id)})
-        logging.info("Getting User by id: %s" % id)
+        # logging.info("Getting User by id: %s" % id)
         return userEntity(user)
     except (InvalidId, TypeError):
         raise HTTPException(status_code=404, detail="User not found")

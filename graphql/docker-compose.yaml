@@ -1,16 +1,13 @@
-version: '3.0'
-
 services:
   graphql:
-    stdin_open: true
+    # stdin_open: true
     build: .
     ports:
       - "4000:4000"
     volumes:
       - ./:/code
-    networks:
-      - microsvcs
-      
+
 networks:
-  microsvcs:
+  default:
+    name: microsvcs
     external: true

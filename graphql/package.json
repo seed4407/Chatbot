@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "dependencies": {
     "express": "^4.17.1",
-    "express-graphql": "^0.12.0"
+    "graphql":"^15.3.0",
+    "express-graphql": "^0.12.0",
+    "axios":"^1.6.1"
   },
   "description": "",
   "main": "server.js",
