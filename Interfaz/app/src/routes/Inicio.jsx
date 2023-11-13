@@ -6,6 +6,7 @@ import Card from 'react-bootstrap/Card';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 
+
 import {
   Box,
   Text,
@@ -22,33 +23,37 @@ import {
 
 import { Layout } from '../layout/Layout';
 
-function eniar_mensaje() {
-  if(document.getElementById("mensaje").value.toString() === "Catalogo de plantas"){
-    axios.post('http://localhost:4000/graphql', {
-      query: '{info_plantas}'
-    })
-    .then(res => {
-      mensajeria(res["data"]["data"]["info_plantas"])
-    })
-    .catch(error => {
-      console.error(error)}
-    );
-  }
-}
+// function inicio_sesion(){
+//   console.log("Hello")
+//   fetch('http://graphql/', {
+//     method: 'POST',
+//     headers: { 'Content-Type': 'application/json' },
+//     body: JSON.stringify({
+//       query: '{loging(username:'+document.getElementById("usuario").value +',password:'+document.getElementById("contrasena").value +')}'
+//     }),
+//   })
+//   .then(res => res.json())
+//   .then(res => console.log(res.data))
+//   .catch(error => console.error(error));
+// }
 
-function mensajeria(datos){
-  let largo_lista = datos.length
-  let variable = "";
-  let dato;
-  let contador = 0;
-  while(contador<largo_lista){
-    dato = datos[contador]
-    variable = "<div>"+variable+"<p> Nombre: "+dato[0]+"</p><p>Descripcion: "+ dato[5]+"</p></div>";
-    contador = contador +1;
-  }
-  var chat = document.getElementById("chat");
-  chat.innerHTML = variable;
-  console.log("%c" + variable, "color: black;");
+function inicio_sesion() {
+  axios.post('http://localhost:4000/graphql', {
+    query: '{loging(username:"'+document.getElementById("usuario").value.toString()+'",password:"'+document.getElementById("contrasena").value.toString()+'")}'
+  })
+  .then(res => {
+    if(res["data"]["data"]["loging"] === "Ingreso mal usuario/contrasena"){
+      var mostrar = document.getElementById("incorrecto");
+      mostrar.style.visibility = "visible"
+    }
+    else{
+      window.location.href = "http://localhost:3000/inicio";
+    }
+    console.log(res["data"]["data"]["loging"])
+  })
+  .catch(error => {
+    console.error(error)}
+  );
 }
 
 export function Landing() {
@@ -74,33 +79,20 @@ export function Landing() {
             </Highlight>
           </Heading>
           <Text color={'gray.500'}>
-          <Card style={{ width: '130%', height: '200%'}}>
-                <Card.Body>
-                  <Card.Subtitle className="mb-2 text-muted"></Card.Subtitle>
-                  <Card.Text>
-                  </Card.Text>
-                  <div class="container">
-                    <div class="row">
-                      <div class="col">
-                        <Card style={{ width: '55rem', height: '300px',overflowY:'scroll'}}>
-                          <Card.Body>
-                            <Card.Title></Card.Title>
-                            <Card.Subtitle className="mb-2 text-muted"></Card.Subtitle>
-                            <Card.Text>
-                              <p id='chat'></p>
-                            </Card.Text>
-                          </Card.Body>
-                        </Card>
-                      </div>
-                      <div class="w-100"></div>
-                      <div class="col">
-                        <input type="text" placeholder="Escribe aquí" id='mensaje' style={{ width: '55rem',borderRadius: '8px',marginTop: '7px',paddingLeft:'7px'}}/>
-                        <button style={{borderRadius: '10px', marginTop: '4px', marginLeft:'2px'}} onClick={eniar_mensaje}>Enviar</button>
-                      </div>
-                    </div>
-                  </div>
-                </Card.Body>
-              </Card>
+            <Card style={{ width: '18rem', marginLeft: '14rem' }}>
+              <Card.Body>
+                <Card.Title>Incio de session</Card.Title>
+                <Card.Subtitle className="mb-2 text-muted"></Card.Subtitle>
+                <Card.Text>
+                  <input style={{marginBottom: '10px', marginTop: '10px',borderRadius: '10px', paddingLeft: '7px', paddingBottom: '3px',paddingTop: '3px'}} type="text" id="usuario" placeholder="Usuario"/>
+                  <input style={{marginBottom: '10px',borderRadius: '10px', paddingLeft: '7px',paddingBottom: '3px',paddingTop: '3px'}} type="text" id="contrasena" placeholder="Contraseña"/>
+                  <p id = "incorrecto" style={{visibility: 'hidden'}}>Ingreso mal usuario/contrasena</p>
+                  <p id = "correcto" style={{visibility: 'hidden'}}>Inicio de sesion exitoso</p>
+                  <button style={{borderRadius: '10px'}} onClick={inicio_sesion}>Iniciar session</button>
+                </Card.Text>
+                <Link to="/registro" className="btn btn-primary">Crear cuenta</Link>
+              </Card.Body>
+            </Card>
           </Text>
         </Stack>
       </Container>

@@ -2,6 +2,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import NotFound from "./routes/NotFound";
 import Root from "./routes/root";
+import Inicio from "./routes/Inicio";
 import Players from "./routes/players";
 import Teams from "./routes/teams";
 import NewTeam from "./routes/NewTeam";
@@ -9,6 +10,10 @@ import NewTeam from "./routes/NewTeam";
 let router = createBrowserRouter([
   {
     path: "/",
+    element: <Inicio />,
+  },
+  {
+    path: "/inicio",
     element: <Root />,
   },
   {

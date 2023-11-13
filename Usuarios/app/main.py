@@ -96,18 +96,22 @@ def get_token():
         return "Conectado"
 
 @app.get(
-    "/users/{name}/{password}",
+    "/users/{username}/{password}",
     tags=["User"],
-    response_model=str,
+    response_model=list[str],
     summary="Logging",
     response_description="Token de usuario",
 )
-def logging(name: str, password: str):
+def loging(username: str, password: str):
     try:
-        user = mongodb_client.service_users.users.find_one({"name": name,"password": password})
-        return "Token"
+        user = mongodb_client.service_users.users.find_one({"username": username})
+        if(sha256_crypt.verify(password,user["password"])):
+            user = userEntity(user)
+            return [str(user["id"]),str(user["token"])]
+        else:
+            return ["Contraseña Incorrecta","Contraseña Incorrecta"]
     except (InvalidId, TypeError):
-        return "No se encontro usuario"
+        return ["No se encontro usuario","No se encontro usuario"]
 
 @app.get(
     "/users",
@@ -118,7 +122,7 @@ def logging(name: str, password: str):
     status_code=status.HTTP_200_OK,
 )
 def get_all_users():
-    # logging.info("Getting all Users...")
+    logging.info("Getting all Users...")
     return usersEntity(mongodb_client.service_users.users.find({}))
 
 
